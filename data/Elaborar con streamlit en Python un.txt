@@ -1,0 +1,67 @@
+Elaborar con streamlit en Python una aplicación profesional para que las personas que realicen un curso, especialización, diplomado puedan descargar
+los certificados en línea que hallan realizado en una institución de formación (Universidad,corporación)
+
+1️⃣ Asegúrate de que tu repo esté en GitHub (harlysrivasp-png)
+Abre VS Code en tu proyecto.
+Confirma que tu repositorio remoto apunta a harlysrivasp-png:
+git remote -v
+
+Debe aparecer algo como:
+
+origin  https://github.com/harlysrivasp-png/Proyecto_Certificados.git (fetch)
+origin  https://github.com/harlysrivasp-png/Proyecto_Certificados.git (push)
+Si no, configúralo:
+git remote remove origin
+git remote add origin https://github.com/harlysrivasp-png/Proyecto_Certificados.git
+git push -u origin main
+2️⃣ Crear requirements.txt
+
+En la raíz de tu proyecto crea requirements.txt con:
+
+streamlit
+pandas
+reportlab
+
+Esto asegura que Streamlit Cloud instale todas las librerías necesarias.
+
+3️⃣ Desplegar en Streamlit Cloud
+Ve a https://share.streamlit.io.
+Cierra cualquier otra sesión y logueate con GitHub → harlysrivasp-png.
+Haz clic en Create app → Deploy a public app from GitHub → Deploy now.
+Configura:
+Repository: harlysrivasp-png/Proyecto_Certificados
+Branch: main
+Main file path: app.py
+Haz clic en Deploy.
+Streamlit instalará las dependencias y te dará un link público.
+4️⃣ Abrir la app
+Al terminar, Streamlit te dará un enlace público tipo:
+https://share.streamlit.io/harlysrivasp-png/Proyecto_Certificados/main/app.py
+Ábrelo en cualquier navegador y tu app funcionará con logo, fondo y firmas.
+
+================================================================
+1️⃣ Crear requirements.txt
+
+En la raíz de tu proyecto (Proyecto_Certificados) crea un archivo llamado requirements.txt con este contenido:
+
+streamlit
+pandas
+reportlab
+streamlit → para la app en sí.
+pandas → para leer el CSV.
+reportlab → para generar los certificados en PDF.
+2️⃣ Subir el archivo a GitHub
+
+En VS Code:
+
+git add requirements.txt
+git commit -m "Agregar requirements.txt con librerías necesarias"
+git push origin main
+3️⃣ Actualizar la app en Streamlit Cloud
+Ve a tu app en Streamlit Cloud.
+Haz clic en Manage app → Redeploy.
+Streamlit instalará automáticamente las librerías del requirements.txt.
+
+Después de esto, tu app debería correr en la nube sin mostrar ModuleNotFoundError.
+
+Si quieres, puedo prepararte el requirements.txt listo para copiar y pegar y los pasos exactos para redeploy para que la app quede funcionando en Streamlit Cloud.
