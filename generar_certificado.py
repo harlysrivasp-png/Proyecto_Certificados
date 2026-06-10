@@ -86,7 +86,7 @@ def generar_certificado(nombre, documento, programa, horas, fecha):
     # TÍTULO
     # ==========================================
 
-    c.setFont("Helvetica-Bold", 25)
+    c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(
         ancho / 2,
         alto - 209,
