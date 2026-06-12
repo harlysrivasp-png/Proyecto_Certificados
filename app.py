@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-
 from generar_certificado import generar_certificado
 
 # ==========================================
@@ -25,34 +24,21 @@ st.write("Consulta y descarga tu certificado académico")
 # ==========================================
 
 try:
-
     df = pd.read_csv(
         "data/certificados.csv",
         encoding="latin1",
         sep=";"
     )
-
     df.columns = df.columns.str.strip()
-
 except Exception as e:
-
     st.error(f"Error al leer el archivo CSV: {e}")
     st.stop()
-
-# ==========================================
-# MOSTRAR COLUMNAS (DEPURACIÓN)
-# ==========================================
-
-# Descomenta esta línea si deseas ver las columnas
-# st.write(df.columns.tolist())
 
 # ==========================================
 # INGRESAR DOCUMENTO
 # ==========================================
 
-documento = st.text_input(
-    "Ingrese su número de documento"
-)
+documento = st.text_input("Ingrese su número de documento")
 
 # ==========================================
 # BOTÓN BUSCAR
@@ -61,68 +47,36 @@ documento = st.text_input(
 if st.button("Buscar Certificado"):
 
     resultado = df[
-        df["documento"].astype(str).str.strip()
-        == documento.strip()
+        df["documento"].astype(str).str.strip() == documento.strip()
     ]
 
     if resultado.empty:
-
-        st.warning(
-            "No se encontraron certificados para este documento."
-        )
-
+        st.warning("No se encontraron certificados para este documento.")
     else:
+        st.success(f"{len(resultado)} certificado(s) encontrado(s)")
 
-        st.success(
-            "Certificado encontrado"
-        )
+        for i, fila in resultado.iterrows():
+            st.subheader(f"Certificado {i+1}")
 
-        for _, fila in resultado.iterrows():
-
-            st.subheader("Información del estudiante")
-
-            st.write(
-                f"**Nombre:** {fila['nombre']}"
-            )
-
-            st.write(
-                f"**Documento:** {fila['documento']}"
-            )
-
-            st.write(
-                f"**Programa:** {fila['programa']}"
-            )
-
+            st.write(f"**Nombre:** {fila['nombre']}")
+            st.write(f"**Documento:** {fila['documento']}")
+            st.write(f"**Programa:** {fila['programa']}")
             if "horas" in df.columns:
-
-                st.write(
-                    f"**Horas:** {fila['horas']}"
-                )
-
+                st.write(f"**Horas:** {fila['horas']}")
             if "fecha" in df.columns:
+                st.write(f"**Fecha:** {fila['fecha']}")
 
-                st.write(
-                    f"**Fecha:** {fila['fecha']}"
-                )
-
-            # ==================================
-            # GENERAR CERTIFICADO PDF
-            # ==================================
-
+            # Generar PDF del certificado
             archivo_pdf = generar_certificado(
                 fila["nombre"],
                 fila["documento"],
                 fila["programa"],
-                fila["horas"],
-                fila["fecha"]
+                fila.get("horas", ""),
+                fila.get("fecha", "")
             )
 
-            # ==================================
-            # DESCARGAR CERTIFICADO
-            # ==================================
-
+            # Botón de descarga del certificado
             with open(archivo_pdf, "rb") as pdf:
-
                 st.download_button(
                     label="📄 Descargar Certificado",
                     data=pdf,
