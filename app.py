@@ -17,7 +17,7 @@ st.set_page_config(
 # ==========================================
 
 st.title("🎓 Portal de Certificados - Oficina de Educación Virtual y a Distancia - UCEVA")
-st.write("Consulta y descarga tu certificado académico")
+st.write("Consulta y descarga tus certificados académicos")
 
 # ==========================================
 # CARGAR BASE DE DATOS
@@ -75,11 +75,12 @@ if st.button("Buscar Certificado"):
                 fila.get("fecha", "")
             )
 
-            # Botón de descarga del certificado
+            # Botón de descarga del certificado con key único
             with open(archivo_pdf, "rb") as pdf:
                 st.download_button(
                     label="📄 Descargar Certificado",
                     data=pdf,
                     file_name=archivo_pdf,
-                    mime="application/pdf"
+                    mime="application/pdf",
+                    key=f"download_{i}"  # Clave única para cada botón
                 )
