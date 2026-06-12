@@ -3,7 +3,7 @@ import pandas as pd
 from generar_certificado import generar_certificado
 
 # ==========================================
-# CONFIGURACIÓN DE LA PÁGINA
+# CONFIGURACIÓN DE PÁGINA
 # ==========================================
 st.set_page_config(
     page_title="Portal de Certificados",
@@ -44,20 +44,22 @@ if st.button("Buscar Certificado"):
     else:
         st.success(f"{len(resultado)} certificado(s) encontrado(s)")
 
-        # ==========================================
-        # BOTONES HORIZONTALES PARA DESCARGA
-        # ==========================================
-        columnas = st.columns(len(resultado))  # Una columna por certificado
+        # Crear columnas para botones horizontales
+        columnas = st.columns(len(resultado))
 
         for i, fila in enumerate(resultado.itertuples()):
+            # Generar PDF con firmas dinámicas
             archivo_pdf = generar_certificado(
                 fila.nombre,
                 fila.documento,
                 fila.programa,
                 getattr(fila, "horas", ""),
-                getattr(fila, "fecha", "")
+                getattr(fila, "fecha", ""),
+                getattr(fila, "firma_decano", "assets/decano_default.png"),
+                getattr(fila, "firma_vicerrector", "assets/vicerrector_default.png")
             )
 
+            # Mostrar cada botón en su columna
             with columnas[i]:
                 st.subheader(f"Certificado {i+1}")
                 st.write(f"**Nombre:** {fila.nombre}")

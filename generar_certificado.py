@@ -1,225 +1,69 @@
 from reportlab.lib.pagesizes import landscape, letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
-import os
 
-
-def generar_certificado(nombre, documento, programa, horas, fecha):
-
-    # ==========================================
-    # RUTAS
-    # ==========================================
-
-    carpeta_salida = "certificados_generados"
-    os.makedirs(carpeta_salida, exist_ok=True)
-
-    archivo = os.path.join(
-        carpeta_salida,
-        f"certificado_{documento}.pdf"
-    )
-
-    fondo = "assets/fondo_certificado.png"
-    logo = "assets/logo.png"
-    firma_1 = "assets/firma_1.png"
-    firma_2 = "assets/firma_2.png"
-
-    # ==========================================
-    # CREAR PDF
-    # ==========================================
-
-    c = canvas.Canvas(
-        archivo,
-        pagesize=landscape(letter)
-    )
-
+def generar_certificado(nombre, documento, programa, horas, fecha, firma_decano, firma_vicerrector):
+    archivo = f"certificado_{documento}_{programa.replace(' ', '_')}.pdf"
+    c = canvas.Canvas(archivo, pagesize=landscape(letter))
     ancho, alto = landscape(letter)
 
-    # ==========================================
+    # =========================
     # FONDO
-    # ==========================================
+    # =========================
+    try:
+        fondo = ImageReader("assets/fondo_certificado.png")  # ruta del fondo
+        c.drawImage(fondo, 0, 0, width=ancho, height=alto)
+    except Exception:
+        pass  # si no hay fondo, se omite
 
-    if os.path.exists(fondo):
-        c.drawImage(
-            ImageReader(fondo),
-            0,
-            0,
-            width=ancho,
-            height=alto,
-            preserveAspectRatio=False,
-            mask="auto"
-        )
-
-    # ==========================================
+    # =========================
     # LOGO
-    # ==========================================
+    # =========================
+    try:
+        logo = ImageReader("assets/logo.png")
+        c.drawImage(logo, 50, alto - 100, width=150, height=80)
+    except Exception:
+        pass
 
-    if os.path.exists(logo):
-        c.drawImage(
-            ImageReader(logo),
-            60,
-            alto - 105,
-            width=130,
-            height=55,
-            preserveAspectRatio=True,
-            mask="auto"
-        )
+    # =========================
+    # TÍTULO Y DATOS
+    # =========================
+    c.setFont("Helvetica-Bold", 30)
+    c.drawCentredString(ancho / 2, alto - 100, "CERTIFICADO")
 
-    # ==========================================
-    # ENCABEZADO
-    # ==========================================
+    c.setFont("Helvetica", 16)
+    c.drawCentredString(ancho / 2, alto - 180, "La Institución certifica que")
 
-    c.setFont("Helvetica-Bold", 28)
-    c.drawCentredString(
-        ancho / 2+6,
-        alto - 125,
-        "UNIDAD CENTRAL DEL VALLE DEL CAUCA"
-    )
-
-    c.setFont("Helvetica", 15)
-    c.drawCentredString(
-        ancho / 2 + 5,
-        alto - 150,
-        "Oficina de Educación Virtual y a Distancia"
-    )
-
-    # ==========================================
-    # TÍTULO
-    # ==========================================
-
-    c.setFont("Helvetica-Bold", 18)
-    c.drawCentredString(
-        ancho / 2,
-        alto - 209,
-        "CERTIFICA QUE"
-    )
-
-    # ==========================================
-    # TEXTO PRINCIPAL
-    # ==========================================
-
-    #c.setFont("Helvetica", 16)
-    #c.drawCentredString(
-       # ancho / 2,
-        #alto - 230,
-        #"El/la participante"
-    #)
-
-    # Nombre
     c.setFont("Helvetica-Bold", 24)
-    c.drawCentredString(
-        ancho / 2,
-        alto - 275,
-        str(nombre).upper()
-    )
+    c.drawCentredString(ancho / 2, alto - 230, str(nombre))
 
-    c.setFont("Helvetica", 15)
-    c.drawCentredString(
-        ancho / 2,
-        alto - 305,
-        f"Identificado(a) con documento No. {documento}"
-    )
+    c.setFont("Helvetica", 16)
+    c.drawCentredString(ancho / 2, alto - 280, f"Identificado(a) con documento No. {documento}")
+    c.drawCentredString(ancho / 2, alto - 320, f"Participó y aprobó satisfactoriamente el programa:")
 
-    c.drawCentredString(
-        ancho / 2,
-        alto - 335,
-        "Participó y aprobó satisfactoriamente el curso:"
-    )
+    c.setFont("Helvetica-Bold", 20)
+    c.drawCentredString(ancho / 2, alto - 360, str(programa))
 
-    # Programa
-    c.setFont("Helvetica-Bold", 19)
-    c.drawCentredString(
-        ancho / 2,
-        alto - 375,
-        str(programa).upper()
-    )
+    c.setFont("Helvetica", 16)
+    c.drawCentredString(ancho / 2, alto - 410, f"Con una intensidad de {horas} horas")
+    c.drawCentredString(ancho / 2, alto - 450, f"Fecha de finalización: {fecha}")
 
-    c.setFont("Helvetica", 15)
-    c.drawCentredString(
-        ancho / 2,
-        alto - 420,
-        f"Con una intensidad de {horas} horas"
-    )
+    # =========================
+    # FIRMAS DINÁMICAS
+    # =========================
+    try:
+        decano = ImageReader(firma_decano)
+        c.drawImage(decano, ancho / 4 - 75, 80, width=150, height=50)
+    except Exception:
+        c.line(ancho / 4 - 75, 100, ancho / 4 + 75, 100)
+    c.drawCentredString(ancho / 4, 60, "Decano")
 
-    c.drawCentredString(
-        ancho / 2,
-        alto - 455,
-        f"Fecha de finalización: {fecha}"
-    )
-
-    # ==========================================
-    # FIRMAS
-    # ==========================================
-
-    # Firma izquierda
-    if os.path.exists(firma_1):
-        c.drawImage(
-            ImageReader(firma_1),
-            140,
-            90,
-            width=160,
-            height=70,
-            preserveAspectRatio=True,
-            mask="auto"
-        )
-
-    c.line(
-        130,
-        105,
-        350,
-        105
-    )
-
-    c.setFont("Helvetica-Bold", 11)
-    c.drawCentredString(
-        240,
-        85,
-        "Gustavo Cárdenas"
-    )
-
-    c.setFont("Helvetica", 10)
-    c.drawCentredString(
-        240,
-        70,
-        "Vicerrector Académico"
-    )
-
-    # Firma derecha
-    if os.path.exists(firma_2):
-        c.drawImage(
-            ImageReader(firma_2),
-            ancho - 300,
-            90,
-            width=160,
-            height=70,
-            preserveAspectRatio=True,
-            mask="auto"
-        )
-
-    c.line(
-        ancho - 350,
-        105,
-        ancho - 130,
-        105
-    )
-
-    c.setFont("Helvetica-Bold", 11)
-    c.drawCentredString(
-        ancho - 240,
-        85,
-        "Juan Albero Pérez"
-    )
-
-    c.setFont("Helvetica", 10)
-    c.drawCentredString(
-        ancho - 240,
-        70,
-        "Decano Facultad"
-    )
-
-    # ==========================================
-    # GUARDAR PDF
-    # ==========================================
+    try:
+        vicerrector = ImageReader(firma_vicerrector)
+        c.drawImage(vicerrector, 3 * ancho / 4 - 75, 80, width=150, height=50)
+    except Exception:
+        c.line(3 * ancho / 4 - 75, 100, 3 * ancho / 4 + 75, 100)
+    c.drawCentredString(3 * ancho / 4, 60, "Vicerrector")
 
     c.save()
-
     return archivo
