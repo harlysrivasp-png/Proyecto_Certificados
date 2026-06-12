@@ -1,86 +1,75 @@
-import streamlit as st
-import pandas as pd
-from generar_certificado import generar_certificado
+from reportlab.lib.pagesizes import landscape, letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 
-# ==========================================
-# CONFIGURACIÓN DE LA PÁGINA
-# ==========================================
+def generar_certificado(nombre, documento, programa, horas, fecha):
+    archivo = f"certificado_{documento}_{programa.replace(' ', '_')}.pdf"
+    c = canvas.Canvas(archivo, pagesize=landscape(letter))
+    ancho, alto = landscape(letter)
 
-st.set_page_config(
-    page_title="Portal de Certificados",
-    page_icon="🎓",
-    layout="centered"
-)
+    # =========================
+    # FONDO (opcional)
+    # =========================
+    try:
+        fondo = ImageReader("assets/fondo_certificado.png")  # tu fondo
+        c.drawImage(fondo, 0, 0, width=ancho, height=alto)
+    except Exception:
+        pass  # si no existe el fondo, se omite
 
-# ==========================================
-# ENCABEZADO
-# ==========================================
+    # =========================
+    # LOGO
+    # =========================
+    try:
+        logo = ImageReader("assets/logo.png")  # tu logo
+        c.drawImage(logo, 50, alto - 100, width=150, height=80)  # posición y tamaño
+    except Exception:
+        pass  # si no existe el logo, se omite
 
-st.title("🎓 Portal de Certificados - Oficina de Educación Virtual y a Distancia - UCEVA")
-st.write("Consulta y descarga tus certificados académicos")
+    # =========================
+    # Título
+    # =========================
+    c.setFont("Helvetica-Bold", 30)
+    c.drawCentredString(ancho / 2, alto - 100, "CERTIFICADO")
 
-# ==========================================
-# CARGAR BASE DE DATOS
-# ==========================================
+    # =========================
+    # Texto principal
+    # =========================
+    c.setFont("Helvetica", 16)
+    c.drawCentredString(ancho / 2, alto - 180, "La Institución certifica que")
 
-try:
-    df = pd.read_csv(
-        "data/certificados.csv",
-        encoding="latin1",
-        sep=";"
-    )
-    df.columns = df.columns.str.strip()
-except Exception as e:
-    st.error(f"Error al leer el archivo CSV: {e}")
-    st.stop()
+    # Nombre del estudiante
+    c.setFont("Helvetica-Bold", 24)
+    c.drawCentredString(ancho / 2, alto - 230, str(nombre))
 
-# ==========================================
-# INGRESAR DOCUMENTO
-# ==========================================
+    c.setFont("Helvetica", 16)
+    c.drawCentredString(ancho / 2, alto - 280, f"Identificado(a) con documento No. {documento}")
+    c.drawCentredString(ancho / 2, alto - 320, f"Participó y aprobó satisfactoriamente el programa:")
 
-documento = st.text_input("Ingrese su número de documento")
+    # Programa
+    c.setFont("Helvetica-Bold", 20)
+    c.drawCentredString(ancho / 2, alto - 360, str(programa))
 
-# ==========================================
-# BOTÓN BUSCAR
-# ==========================================
+    # Horas y fecha
+    c.setFont("Helvetica", 16)
+    c.drawCentredString(ancho / 2, alto - 410, f"Con una intensidad de {horas} horas")
+    c.drawCentredString(ancho / 2, alto - 450, f"Fecha de finalización: {fecha}")
 
-if st.button("Buscar Certificado"):
+    # =========================
+    # Firmas
+    # =========================
+    try:
+        firma1 = ImageReader("assets/firma1.png")  # firma izquierda
+        c.drawImage(firma1, ancho / 4 - 75, 80, width=150, height=50)
+    except Exception:
+        c.line(ancho / 4 - 75, 100, ancho / 4 + 75, 100)  # línea si no hay firma
+    c.drawCentredString(ancho / 4, 60, "Dirección Académica")
 
-    resultado = df[
-        df["documento"].astype(str).str.strip() == documento.strip()
-    ]
+    try:
+        firma2 = ImageReader("assets/firma2.png")  # firma derecha
+        c.drawImage(firma2, 3 * ancho / 4 - 75, 80, width=150, height=50)
+    except Exception:
+        c.line(3 * ancho / 4 - 75, 100, 3 * ancho / 4 + 75, 100)
+    c.drawCentredString(3 * ancho / 4, 60, "Coordinación Académica")
 
-    if resultado.empty:
-        st.warning("No se encontraron certificados para este documento.")
-    else:
-        st.success(f"{len(resultado)} certificado(s) encontrado(s)")
-
-        for i, fila in resultado.iterrows():
-            st.subheader(f"Certificado {i+1}")
-
-            st.write(f"**Nombre:** {fila['nombre']}")
-            st.write(f"**Documento:** {fila['documento']}")
-            st.write(f"**Programa:** {fila['programa']}")
-            if "horas" in df.columns:
-                st.write(f"**Horas:** {fila['horas']}")
-            if "fecha" in df.columns:
-                st.write(f"**Fecha:** {fila['fecha']}")
-
-            # Generar PDF del certificado
-            archivo_pdf = generar_certificado(
-                fila["nombre"],
-                fila["documento"],
-                fila["programa"],
-                fila.get("horas", ""),
-                fila.get("fecha", "")
-            )
-
-            # Botón de descarga del certificado con key único
-            with open(archivo_pdf, "rb") as pdf:
-                st.download_button(
-                    label="📄 Descargar Certificado",
-                    data=pdf,
-                    file_name=archivo_pdf,
-                    mime="application/pdf",
-                    key=f"download_{i}"  # Clave única para cada botón
-                )
+    c.save()
+    return archivo
