@@ -1,9 +1,8 @@
-documento;nombre;programa;fecha;horas
-11111111;Juan Pérez;Diplomado IA;15/05/2026;40
-123344;Diana Rengifo;Curso Virtual ;16/04/2022;80
-23456677;Juan Murillo;Docencia;18/04/2021;20
-4567;María Castañeda;Tutor Virtual;20/03/2021;40
-4567;María Castañeda;IA Generativa;20/04/2021;40
-4567;María Castañeda;Docenia y Pedagogía ;20/03/2021;40
+nombre;documento;programa;horas;fecha;facultad;firma_decano;firma_vicerrector
+Juan Pérez;12345;Educación Inicial;40;2026-05-10;Educación;assets/decano_educacion.png;assets/vicerrector.png
+Juan Pérez;12345;Matemáticas Básicas;50;2026-05-12;Salud;assets/decano_salud.png;assets/vicerrector.png
+Juan Pérez;12345;Matemáticas Básicas II;50;2026-05-12;Salud;assets/decano_economicas.png;assets/vicerrector.png
+Ana Gómez;67890;Economía Aplicada;60;2026-05-15;Ciencias Económicas;assets/decano_economicas.png;assets/vicerrector.png
+Luis Martínez;54321;Psicología General;45;2026-05-18;Ciencias Humanísticas;assets/decano_humanisticas.png;assets/vicerrector.png
 
 
