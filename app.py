@@ -3,12 +3,13 @@ import pandas as pd
 import os
 from generar_certificado import generar_certificado
 
-# Crear carpeta de salida si no existe
-os.makedirs("certificados_generados", exist_ok=True)
-
+# Título de la app
 st.title("Portal de Certificados")
 
-# Cargar CSV con separador ; y manejar valores vacíos
+# Crear carpeta para guardar certificados generados
+os.makedirs("certificados_generados", exist_ok=True)
+
+# Cargar CSV
 csv_path = "data/certificados_streamlit_ready.csv"
 try:
     df = pd.read_csv(csv_path, sep=';', encoding="utf-8-sig").fillna("")
@@ -16,55 +17,46 @@ except Exception as e:
     st.error(f"No se pudo leer el CSV: {e}")
     st.stop()
 
-# Convertir documento a string para evitar problemas
-if "documento" not in df.columns:
-    st.error("El CSV debe tener la columna 'documento'")
-    st.stop()
-df["documento"] = df["documento"].astype(str)
-
 # Input de documento
-documento_buscar = st.text_input("Ingrese el número de documento del estudiante:")
+documento_buscar = st.text_input("Ingrese el documento del estudiante")
 
 if documento_buscar:
-    df_user = df[df["documento"].astype(str) == documento_buscar]
+    # Filtrar por documento
+    df["documento"] = df["documento"].astype(str)
+    df_user = df[df["documento"] == documento_buscar]
+
     if df_user.empty:
-        st.warning("No se encontró ningún registro con ese documento")
+        st.warning("No se encontraron certificados para ese documento.")
     else:
-        st.write(f"Se encontraron {len(df_user)} curso(s)/diplomado(s) para este estudiante.")
+        st.write(f"Se encontraron {len(df_user)} certificados para el documento {documento_buscar}.")
 
-        # Mostrar y generar los certificados
         for idx, fila in df_user.iterrows():
-            curso_nombre = fila.get("curso_o_diplomado", "Curso Desconocido")
-            horas = fila.get("horas", "0")
-            fecha = fila.get("fecha", "")
-            facultad = fila.get("facultad", "")
-            firma_decano = fila.get("firma_decano", "assets/firma_decano.png")
-            nombre_decano = fila.get("nombre_decano", "")
-            firma_vicerrector = fila.get("firma_vicerrector", "assets/firma_vicerrector.png")
-            nombre_vicerrector = fila.get("nombre_vicerrector", "")
+            curso_nombre = fila["curso_o_diplomado"]
+            output_file = f"certificados_generados/{fila.documento}_{curso_nombre.replace(' ','_')}.pdf"
 
-            output_file = f"certificados_generados/{fila['documento']}_{curso_nombre.replace(' ','_')}.pdf"
-
-            # Generar PDF
+            # Generar certificado
             generar_certificado(
-                nombre=fila.get("nombre", ""),
-                documento=fila.get("documento", ""),
-                curso_o_diplomado=curso_nombre,
-                horas=horas,
-                fecha=fecha,
-                facultad=facultad,
-                firma_decano=firma_decano,
-                nombre_decano=nombre_decano,
-                firma_vicerrector=firma_vicerrector,
-                nombre_vicerrector=nombre_vicerrector,
+                nombre=fila["nombre"],
+                documento=fila["documento"],
+                curso=fila["curso_o_diplomado"],
+                horas=fila["horas"],
+                fecha=fila["fecha"],
+                facultad=fila["facultad"],
+                firma_decano=fila["firma_decano"],
+                nombre_decano=fila["nombre_decano"],
+                firma_vicerrector=fila["firma_vicerrector"],
+                nombre_vicerrector=fila["nombre_vicerrector"],
                 output_path=output_file
             )
 
-            st.write(f"**Certificado:** {curso_nombre}")
-            with open(output_file, "rb") as f:
+            st.success(f"Certificado generado para {curso_nombre}")
+
+            # Botón de descarga
+            with open(output_file, "rb") as pdf_file:
+                pdf_bytes = pdf_file.read()
                 st.download_button(
                     label=f"📄 Descargar {curso_nombre}",
-                    data=f.read(),
+                    data=pdf_bytes,
                     file_name=os.path.basename(output_file),
                     mime="application/pdf"
                 )

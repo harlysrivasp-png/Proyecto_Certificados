@@ -1,14 +1,12 @@
-# generar_certificado.py
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
-import os
 
 def generar_certificado(
     nombre,
     documento,
-    curso_o_diplomado,
+    curso,
     horas,
     fecha,
     facultad,
@@ -16,79 +14,78 @@ def generar_certificado(
     nombre_decano,
     firma_vicerrector,
     nombre_vicerrector,
-    logo_path="assets/logo_uceva.png",
-    plantilla_fondo="assets/fondo_certificado.png",
-    output_path="certificados_generados/certificado.pdf"
+    logo="assets/logo.png",
+    plantilla_fondo="assets/plantilla_fondo.png",
+    output_path="certificado.pdf"
 ):
-    """
-    Genera un certificado en PDF con logo, fondo, firmas, líneas y nombres.
-    """
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    width, height = letter
-    c = canvas.Canvas(output_path, pagesize=letter)
+    # Crear PDF horizontal tamaño carta
+    width, height = landscape(letter)
+    c = canvas.Canvas(output_path, pagesize=(width, height))
 
-    # Fondo
-    if os.path.exists(plantilla_fondo):
-        c.drawImage(ImageReader(plantilla_fondo), 0, 0, width=width, height=height, mask='auto')
+    # Dibujar la plantilla de fondo
+    if plantilla_fondo:
+        c.drawImage(ImageReader(plantilla_fondo), 0, 0, width=width, height=height)
 
-    # Logo superior izquierdo
-    if os.path.exists(logo_path):
-        c.drawImage(ImageReader(logo_path), 2*cm, height - 4*cm, width=4*cm, height=2*cm, mask='auto')
+    # Logo
+    if logo:
+        c.drawImage(ImageReader(logo), 2*cm, height - 5*cm, width=4*cm, preserveAspectRatio=True, mask='auto')
 
-    # Encabezado
+    # Ajuste de título y subtítulo más abajo
+    y_titulo = height - 4*cm
+    c.setFont("Helvetica-Bold", 24)
+    c.drawCentredString(width/2, y_titulo, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
+
+    c.setFont("Helvetica", 16)
+    y_subtitulo = y_titulo - 1.2*cm
+    c.drawCentredString(width/2, y_subtitulo, f"Facultad de {facultad}")
+
+    # Texto principal
+    y_inicio = y_subtitulo - 3*cm
     c.setFont("Helvetica-Bold", 18)
-    c.drawCentredString(width/2, height - 4*cm, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
-    c.setFont("Helvetica", 14)
-    c.drawCentredString(width/2, height - 5*cm, f"Facultad de {facultad}")
-
-    # Cuerpo del certificado
-    y_text = height - 7*cm
-    c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width/2, y_text, "CERTIFICA QUE")
-    y_text -= 1.5*cm
+    c.drawCentredString(width/2, y_inicio, "CERTIFICA QUE")
 
     c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(width/2, y_text, nombre.upper())
-    y_text -= 1*cm
+    y_nombre = y_inicio - 1.5*cm
+    c.drawCentredString(width/2, y_nombre, nombre)
 
-    c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, y_text, f"Identificado(a) con documento No. {documento}")
-    y_text -= 1*cm
-    c.drawCentredString(width/2, y_text, "Participó y aprobó satisfactoriamente el curso:")
-    y_text -= 1*cm
+    c.setFont("Helvetica", 14)
+    y_doc = y_nombre - 1*cm
+    c.drawCentredString(width/2, y_doc, f"Identificado(a) con documento No. {documento}")
 
-    c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width/2, y_text, curso_o_diplomado)
-    y_text -= 1*cm
+    y_curso = y_doc - 1*cm
+    c.drawCentredString(width/2, y_curso, "Participó y aprobó satisfactoriamente el curso:")
+    
+    y_curso_nombre = y_curso - 1*cm
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width/2, y_curso_nombre, curso)
 
-    c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, y_text, f"Con una intensidad de {horas} horas")
-    y_text -= 1*cm
-    c.drawCentredString(width/2, y_text, f"Fecha de finalización: {fecha}")
+    y_horas = y_curso_nombre - 1*cm
+    c.setFont("Helvetica", 14)
+    c.drawCentredString(width/2, y_horas, f"Con una intensidad de {horas} horas")
+
+    y_fecha = y_horas - 1*cm
+    c.drawCentredString(width/2, y_fecha, f"Fecha de finalización: {fecha}")
 
     # Firmas
     y_firma = 4*cm
     firma_ancho = 6*cm
-    firma_alto = 2*cm
+    firma_alto = 3*cm
 
-    # Decano
-    if os.path.exists(firma_decano):
-        c.drawImage(ImageReader(firma_decano), width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto, mask='auto')
-    c.line(width/4 - firma_ancho/2, y_firma - 0.1*cm, width/4 + firma_ancho/2, y_firma - 0.1*cm)
-    c.setFont("Helvetica-Bold", 10)
-    c.drawCentredString(width/4, y_firma - 0.8*cm, nombre_decano)
-    c.setFont("Helvetica", 9)
-    c.drawCentredString(width/4, y_firma - 1.3*cm, f"Decano(a) Facultad de {facultad}")
+    if firma_decano:
+        c.drawImage(ImageReader(firma_decano), width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto)
+    if firma_vicerrector:
+        c.drawImage(ImageReader(firma_vicerrector), 3*width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto)
 
-    # Vicerrector
-    if os.path.exists(firma_vicerrector):
-        c.drawImage(ImageReader(firma_vicerrector), 3*width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto, mask='auto')
-    c.line(3*width/4 - firma_ancho/2, y_firma - 0.1*cm, 3*width/4 + firma_ancho/2, y_firma - 0.1*cm)
-    c.setFont("Helvetica-Bold", 10)
-    c.drawCentredString(3*width/4, y_firma - 0.8*cm, nombre_vicerrector)
-    c.setFont("Helvetica", 9)
-    c.drawCentredString(3*width/4, y_firma - 1.3*cm, "Vicerrector Académico")
+    # Línea y nombres debajo de la firma
+    y_nombre_firma = y_firma - 0.3*cm
+    c.setFont("Helvetica-Bold", 12)
+    c.drawCentredString(width/4, y_nombre_firma, nombre_decano)
+    c.drawCentredString(3*width/4, y_nombre_firma, nombre_vicerrector)
 
-    c.showPage()
+    c.setFont("Helvetica", 12)
+    y_cargo_firma = y_nombre_firma - 0.5*cm
+    c.drawCentredString(width/4, y_cargo_firma, f"Decano(a) Facultad de {facultad}")
+    c.drawCentredString(3*width/4, y_cargo_firma, "Vicerrector Académico")
+
     c.save()
     return output_path
