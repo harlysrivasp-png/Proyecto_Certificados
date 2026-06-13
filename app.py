@@ -1,32 +1,34 @@
+# app.py
 import streamlit as st
 import pandas as pd
 from generar_certificado import generar_certificado
 import os
 
-# Crear carpeta de salida si no existe
+st.set_page_config(page_title="Portal de Certificados", layout="wide")
+st.title("Portal de Certificados - UCEVA")
+
+# Carpeta para certificados generados
 os.makedirs("certificados_generados", exist_ok=True)
 
-st.title("Portal de Certificados")
-
-# Cargar CSV
+# Leer CSV
 try:
-    df = pd.read_csv("data/certificados_streamlit_ready.csv", sep=';', encoding="utf-8-sig').fillna("")
+    df = pd.read_csv("data/certificados_streamlit_ready.csv", sep=';', encoding="utf-8-sig").fillna("")
 except Exception as e:
-    st.error(f"Error al leer el CSV: {e}")
+    st.error(f"No se pudo leer el CSV: {e}")
     st.stop()
 
-# Solicitar documento del estudiante
-documento_buscar = st.text_input("Ingrese el número de documento del estudiante:")
+# Convertir documento a string
+df["documento"] = df["documento"].astype(str)
 
-if documento_buscar:
-    # Filtrar por documento
-    df["documento"] = df["documento"].astype(str)
-    df_user = df[df["documento"] == documento_buscar.strip()]
+# Input del usuario
+documento_input = st.text_input("Ingrese su número de documento:")
 
+if documento_input:
+    df_user = df[df["documento"] == documento_input.strip()]
     if df_user.empty:
         st.warning("No se encontraron certificados para este documento.")
     else:
-        st.write(f"Se encontraron {len(df_user)} certificado(s)")
+        st.success(f"Se encontraron {len(df_user)} curso(s) para este documento.")
 
         for idx, fila in df_user.iterrows():
             curso_nombre = str(fila["curso_o_diplomado"])
@@ -49,11 +51,12 @@ if documento_buscar:
                 output_path=output_file
             )
 
-            st.success(f"Certificado generado: {output_file}")
+            st.markdown(f"**Certificado: {curso_nombre}**")
             with open(output_file, "rb") as pdf_file:
+                pdf_bytes = pdf_file.read()
                 st.download_button(
-                    label=f"📄 Descargar certificado: {curso_nombre}",
-                    data=pdf_file.read(),
-                    file_name=output_file.split("/")[-1],
+                    label=f"📄 Descargar {curso_nombre}",
+                    data=pdf_bytes,
+                    file_name=os.path.basename(output_file),
                     mime="application/pdf"
                 )
