@@ -14,7 +14,7 @@ def generar_certificado(
     nombre_decano,
     firma_vicerrector,
     nombre_vicerrector,
-    logo="assets/logo_uceva.png",
+    logo="assets/logo.png",
     plantilla_fondo="assets/plantilla_fondo.png",
     output_path="certificado.pdf"
 ):
@@ -26,7 +26,7 @@ def generar_certificado(
     c.drawImage(ImageReader(plantilla_fondo), 0, 0, width=width, height=height)
 
     # Logo UCEVA
-    c.drawImage(ImageReader(logo_uceva), 2*cm, height - 5*cm, width=4*cm, preserveAspectRatio=True, mask='auto')
+    c.drawImage(ImageReader(logo), 2*cm, height - 5*cm, width=4*cm, preserveAspectRatio=True, mask='auto')
 
     # Título principal
     c.setFont("Helvetica-Bold", 24)
