@@ -1,78 +1,45 @@
 import streamlit as st
 import pandas as pd
 from generar_certificado import generar_certificado
+from io import BytesIO
 
-# ==========================================
-# CONFIGURACIÓN DE PÁGINA
-# ==========================================
-st.set_page_config(
-    page_title="Portal de Certificados",
-    page_icon="🎓",
-    layout="centered"
-)
+st.set_page_config(page_title="Portal de Certificados", layout="wide")
+st.title("📄 Portal de Certificados - UCEVA")
 
-# ==========================================
-# ENCABEZADO
-# ==========================================
-st.title("🎓 Portal de Certificados - Oficina de Educación Virtual y a Distancia - UCEVA")
-st.write("Consulta y descarga tus certificados académicos")
+# Cargar datos de certificados
+df = pd.read_csv("certificados.csv")  # Asegúrate que tenga columnas: nombre, documento, programa, horas, fecha, logo, firma_decano, cargo_decano, firma_vicerrector, cargo_vicerrector
 
-# ==========================================
-# CARGAR BASE DE DATOS
-# ==========================================
-try:
-    df = pd.read_csv("data/certificados.csv", encoding="latin1", sep=";")
-    df.columns = df.columns.str.strip()
-except Exception as e:
-    st.error(f"Error al leer el archivo CSV: {e}")
-    st.stop()
+# Selección de documento
+documento = st.text_input("Ingrese el número de documento del estudiante:")
 
-# ==========================================
-# INGRESAR DOCUMENTO
-# ==========================================
-documento = st.text_input("Ingrese su número de documento")
-
-# ==========================================
-# BOTÓN BUSCAR
-# ==========================================
-if st.button("Buscar Certificado"):
-
-    resultado = df[df["documento"].astype(str).str.strip() == documento.strip()]
-
-    if resultado.empty:
+if documento:
+    estudiante = df[df["documento"] == int(documento)]
+    
+    if estudiante.empty:
         st.warning("No se encontraron certificados para este documento.")
     else:
-        st.success(f"{len(resultado)} certificado(s) encontrado(s)")
-
-        # Crear columnas para botones horizontales
-        columnas = st.columns(len(resultado))
-
-        for i, fila in enumerate(resultado.itertuples()):
-            # Generar PDF con firmas dinámicas
-            archivo_pdf = generar_certificado(
-                fila.nombre,
-                fila.documento,
-                fila.programa,
-                getattr(fila, "horas", ""),
-                getattr(fila, "fecha", ""),
-                getattr(fila, "firma_decano", "assets/decano_default.png"),
-                getattr(fila, "firma_vicerrector", "assets/vicerrector_default.png")
-            )
-
-            # Mostrar cada botón en su columna
-            with columnas[i]:
-                st.subheader(f"Certificado {i+1}")
-                st.write(f"**Nombre:** {fila.nombre}")
-                st.write(f"**Programa:** {fila.programa}")
-                if hasattr(fila, "horas"):
-                    st.write(f"**Horas:** {fila.horas}")
-                if hasattr(fila, "fecha"):
-                    st.write(f"**Fecha:** {fila.fecha}")
+        st.success(f"Se encontraron {len(estudiante)} certificado(s) para este estudiante.")
+        
+        cols = st.columns(len(estudiante))  # Botones en horizontal
+        
+        for i, (index, fila) in enumerate(estudiante.iterrows()):
+            with cols[i]:
+                archivo_pdf = generar_certificado(
+                    nombre=fila["nombre"],
+                    documento=fila["documento"],
+                    programa=fila["programa"],
+                    horas=fila["horas"],
+                    fecha=fila["fecha"],
+                    logo_path=fila.get("logo", "assets/logo_default.png"),
+                    firma1=fila.get("firma_decano", "assets/decano_default.png"),
+                    cargo1=fila.get("cargo_decano", "Decano/a"),
+                    firma2=fila.get("firma_vicerrector", "assets/vicerrector_default.png"),
+                    cargo2=fila.get("cargo_vicerrector", "Vicerrector/a")
+                )
 
                 st.download_button(
-                    label="📄 Descargar Certificado",
-                    data=open(archivo_pdf, "rb").read(),
-                    file_name=archivo_pdf,
-                    mime="application/pdf",
-                    key=f"download_{i}"
+                    label=f"📄 Descargar: {fila['programa']}",
+                    data=archivo_pdf,
+                    file_name=f"certificado_{fila['documento']}_{fila['programa']}.pdf",
+                    mime="application/pdf"
                 )
