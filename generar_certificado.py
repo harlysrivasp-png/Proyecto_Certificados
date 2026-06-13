@@ -46,7 +46,7 @@ def generar_certificado(
     c.setFont("Helvetica", 14)
     c.drawCentredString(width/2, height - 10*cm, f"Identificado(a) con documento No. {documento}")
     c.drawCentredString(width/2, height - 11*cm, "Participó y aprobó satisfactoriamente el curso:")
-    c.setFont("Helvetica-Bold", 20)
+    c.setFont("Helvetica-Bold", 23)
     c.drawCentredString(width/2, height - 12.7*cm, f"{curso_o_diplomado}")
     c.setFont("Helvetica", 14)
     c.drawCentredString(width/2, height - 14*cm, f"Con una intensidad de {horas} horas")
@@ -60,7 +60,7 @@ def generar_certificado(
     # Firma del decano
     c.drawImage(ImageReader(firma_decano), width/4 - firma_ancho/2, y_firma + 0.7*cm, width=firma_ancho, height=firma_alto, preserveAspectRatio=True, mask='auto')
     # Línea horizontal bajo la firma
-    c.line(width/4 - firma_ancho/2, y_firma + 0.5*cm, width/4 + firma_ancho/2, y_firma + 0.5*cm)
+    c.line(width/14 - firma_ancho/2, y_firma + 0.5*cm, width/4 + firma_ancho/2, y_firma + 0.5*cm)
     c.setFont("Helvetica-Bold", 12)
     c.drawCentredString(width/4, y_firma, nombre_decano)
     c.setFont("Helvetica", 10)
