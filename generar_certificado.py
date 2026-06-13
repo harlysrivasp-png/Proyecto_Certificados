@@ -34,7 +34,7 @@ def generar_certificado(
 
     # Subtítulo: Facultad
     c.setFont("Helvetica", 16)
-    c.drawCentredString(width/2, height - 4*cm, f"Facultad de {facultad}")
+    c.drawCentredString(width/2, height - 6*cm, f"Facultad de {facultad}")
 
     # Texto central
     c.setFont("Helvetica-Bold", 18)
