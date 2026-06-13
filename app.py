@@ -34,7 +34,7 @@ if documento_buscar:
         # Botones horizontales para descargar cada certificado
         cols = st.columns(len(df_user))
         for i, fila in enumerate(df_user.itertuples()):
-            curso_nombre = getattr(fila, "curso o diplomado")  # columna CSV
+            curso_nombre = getattr(fila, "curso_o_diplomado")  # columna CSV
             archivo_pdf = generar_certificado(
                 nombre=fila.nombre,
                 documento=fila.documento,
