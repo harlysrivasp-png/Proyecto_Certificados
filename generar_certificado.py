@@ -33,7 +33,7 @@ def generar_certificado(
 
     # Logo superior izquierdo
     if os.path.exists(logo_path):
-        c.drawImage(ImageReader(logo_path), 2*cm, height - 4*cm, width=4*cm, height=3*cm, mask='auto')
+        c.drawImage(ImageReader(logo_path), 2*cm, height - 4*cm, width=4*cm, height=2*cm, mask='auto')
 
     # Encabezado
     c.setFont("Helvetica-Bold", 18)
