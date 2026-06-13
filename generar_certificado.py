@@ -14,7 +14,7 @@ def generar_certificado(
     nombre_decano,
     firma_vicerrector,
     nombre_vicerrector,
-    logo="assets/logo.png",
+    logo="assets/logo.jpg",
     plantilla_fondo="assets/plantilla_fondo.png",
     output_path="certificado.pdf"
 ):
