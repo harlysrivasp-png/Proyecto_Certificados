@@ -7,8 +7,8 @@ from generar_certificado import generar_certificado
 st.set_page_config(page_title="Portal de Certificados", layout="wide")
 st.title("📄 Portal de Certificados - UCEVA")
 
-# Leer CSV convertido a UTF-8
-csv_path = "certificados_final_utf8.csv"  # Asegúrate de subir este archivo a Streamlit
+# Leer CSV con ruta absoluta y codificación UTF-8
+csv_path = "/mnt/data/certificados_final_utf8.csv"
 try:
     df = pd.read_csv(csv_path, encoding="utf-8-sig", sep=";")
 except Exception as e:
@@ -19,7 +19,7 @@ except Exception as e:
 documento_input = st.text_input("Ingrese su número de documento:")
 
 if documento_input:
-    # Filtrar los certificados por documento
+    # Filtrar certificados por documento
     resultados = df[df['documento'].astype(str) == documento_input.strip()]
     
     if resultados.empty:
