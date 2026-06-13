@@ -1,74 +1,53 @@
-# generar_certificado.py
-from reportlab.lib.pagesizes import landscape, letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
+from reportlab.lib.units import inch
+import io
 
-def generar_certificado(nombre, documento, programa, horas, fecha,
-                        logo="assets/logo_default.png",
-                        firma_decano="assets/firma_decano_default.png",
-                        cargo_decano="Decano/a",
-                        firma_vicerrector="assets/firma_vicerrector_default.png",
-                        cargo_vicerrector="Vicerrector/a"):
-    
-    archivo = f"certificado_{documento}_{programa.replace(' ', '_')}.pdf"
-    c = canvas.Canvas(archivo, pagesize=landscape(letter))
-    ancho, alto = landscape(letter)
+def generar_certificado(nombre, documento, programa, horas, fecha, facultad,
+                        firma_decano, cargo_decano, firma_vicerrector, cargo_vicerrector,
+                        logo=None):
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=landscape(letter))
+    width, height = landscape(letter)
 
-    # =========================
-    # LOGO UCEVA
-    # =========================
-    try:
-        logo_img = ImageReader(logo)
-        c.drawImage(logo_img, 50, alto - 120, width=150, height=80, preserveAspectRatio=True)
-    except Exception:
-        pass
+    # Logo
+    if logo:
+        try:
+            c.drawImage(logo, 50, height - 100, width=100, preserveAspectRatio=True, mask='auto')
+        except:
+            pass
 
-    # =========================
-    # ENCABEZADO UCEVA
-    # =========================
+    # Título
     c.setFont("Helvetica-Bold", 24)
-    c.drawCentredString(ancho / 2, alto - 80, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
-    c.setFont("Helvetica", 16)
-    c.drawCentredString(ancho / 2, alto - 110, "Oficina de Educación Virtual y a Distancia")
+    c.drawCentredString(width / 2, height - 50, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
 
-    # =========================
-    # TÍTULO CERTIFICADO
-    # =========================
-    c.setFont("Helvetica-Bold", 30)
-    c.drawCentredString(ancho / 2, alto - 180, "CERTIFICA QUE")
+    # Subtítulo dinámico: facultad
+    c.setFont("Helvetica", 18)
+    c.drawCentredString(width / 2, height - 100, f"Facultad de {facultad}")
 
-    # =========================
-    # DATOS DEL ESTUDIANTE
-    # =========================
-    c.setFont("Helvetica-Bold", 24)
-    c.drawCentredString(ancho / 2, alto - 240, nombre)
-    c.setFont("Helvetica", 16)
-    c.drawCentredString(ancho / 2, alto - 280, f"Identificado(a) con documento No. {documento}")
-    c.drawCentredString(ancho / 2, alto - 320, f"Participó y aprobó satisfactoriamente el programa:")
+    # Certifica que
     c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(ancho / 2, alto - 360, programa)
+    c.drawCentredString(width / 2, height - 160, "CERTIFICA QUE")
+
+    # Nombre
+    c.setFont("Helvetica-Bold", 22)
+    c.drawCentredString(width / 2, height - 200, nombre)
+
+    # Documento y curso
     c.setFont("Helvetica", 16)
-    c.drawCentredString(ancho / 2, alto - 410, f"Con una intensidad de {horas} horas")
-    c.drawCentredString(ancho / 2, alto - 450, f"Fecha de finalización: {fecha}")
+    c.drawCentredString(width / 2, height - 240, f"Documento: {documento}")
+    c.drawCentredString(width / 2, height - 270, f"Curso: {programa} ({horas} horas)")
+    c.drawCentredString(width / 2, height - 300, f"Fecha: {fecha}")
 
-    # =========================
-    # FIRMAS DINÁMICAS
-    # =========================
-    # Firma decano
-    try:
-        firma_decano_img = ImageReader(firma_decano)
-        c.drawImage(firma_decano_img, ancho / 4 - 75, 80, width=150, height=50)
-    except Exception:
-        c.line(ancho / 4 - 75, 100, ancho / 4 + 75, 100)
-    c.drawCentredString(ancho / 4, 60, cargo_decano)
+    # Firmas
+    firma_y = 100
+    c.drawImage(firma_decano, width / 4 - 50, firma_y, width=150, preserveAspectRatio=True, mask='auto')
+    c.drawString(width / 4 - 30, firma_y - 20, cargo_decano)
 
-    # Firma vicerrector
-    try:
-        firma_vicerrector_img = ImageReader(firma_vicerrector)
-        c.drawImage(firma_vicerrector_img, 3 * ancho / 4 - 75, 80, width=150, height=50)
-    except Exception:
-        c.line(3 * ancho / 4 - 75, 100, 3 * ancho / 4 + 75, 100)
-    c.drawCentredString(3 * ancho / 4, 60, cargo_vicerrector)
+    c.drawImage(firma_vicerrector, 3 * width / 4 - 50, firma_y, width=150, preserveAspectRatio=True, mask='auto')
+    c.drawString(3 * width / 4 - 30, firma_y - 20, cargo_vicerrector)
 
+    c.showPage()
     c.save()
-    return archivo
+    buffer.seek(0)
+    return buffer
