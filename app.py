@@ -3,85 +3,52 @@ import pandas as pd
 import os
 from generar_certificado import generar_certificado
 
-st.set_page_config(page_title="Portal de Certificados", layout="wide")
 st.title("Portal de Certificados UCEVA")
-
-# Carpeta de salida
-os.makedirs("certificados_generados", exist_ok=True)
 
 # Leer CSV
 csv_path = "data/certificados_streamlit_ready.csv"
-try:
-    df = pd.read_csv(csv_path, sep=';', encoding="utf-8-sig").fillna("")
-except Exception as e:
-    st.error(f"No se pudo leer el CSV: {e}")
+if not os.path.exists(csv_path):
+    st.error(f"No se encontró el archivo CSV en {csv_path}")
     st.stop()
 
-# Convertir documento a string
-if "documento" not in df.columns:
-    st.error("El CSV debe tener la columna 'documento'")
-    st.stop()
-df["documento"] = df["documento"].astype(str)
+df = pd.read_csv(csv_path, sep=";", encoding="utf-8-sig").fillna("")
 
-# Input de documento
-documento_input = st.text_input("Ingrese el número de documento del estudiante:")
+documento_buscar = st.text_input("Ingrese el número de documento")
 
-if documento_input:
-    df_user = df[df["documento"] == documento_input.strip()]
+if documento_buscar:
+    df["documento"] = df["documento"].astype(str)
+    df_user = df[df["documento"] == documento_buscar]
+
     if df_user.empty:
-        st.warning("No se encontraron certificados para este documento.")
+        st.warning("No se encontraron certificados para este documento")
     else:
-        st.success(f"Se encontraron {len(df_user)} certificados para este estudiante.")
+        st.subheader("Certificados disponibles:")
 
-        for idx, fila in df_user.iterrows():
-            # Valores por defecto
-            curso_nombre = fila.get("curso_o_diplomado", "Curso Desconocido")
-            horas = fila.get("horas", "0")
-            fecha = fila.get("fecha", "")
-            facultad = fila.get("facultad", "")
-            nombre = fila.get("nombre", "")
-            nombre_decano = fila.get("nombre_decano", "")
-            nombre_vicerrector = fila.get("nombre_vicerrector", "")
-
-            # Validar rutas de imágenes
-            logo = "assets/logo_uceva.png"
-            plantilla_fondo = "assets/plantilla_fondo.png"
-            firma_decano = fila.get("firma_decano", "")
-            firma_vicerrector = fila.get("firma_vicerrector", "")
-
-            if not os.path.exists(logo):
-                logo = None
-            if not os.path.exists(plantilla_fondo):
-                plantilla_fondo = None
-            if not os.path.exists(firma_decano):
-                firma_decano = None
-            if not os.path.exists(firma_vicerrector):
-                firma_vicerrector = None
-
+        for i, fila in df_user.iterrows():
+            curso_nombre = fila["curso_o_diplomado"]
             output_file = f"certificados_generados/{fila['documento']}_{curso_nombre.replace(' ','_')}.pdf"
+            os.makedirs("certificados_generados", exist_ok=True)
 
             # Generar certificado
             generar_certificado(
-                nombre=nombre,
+                nombre=fila["nombre"],
                 documento=fila["documento"],
-                curso_o_diplomado=curso_nombre,
-                horas=horas,
-                fecha=fecha,
-                facultad=facultad,
-                logo=logo,
-                plantilla_fondo=plantilla_fondo,
-                firma_decano=firma_decano,
-                nombre_decano=nombre_decano,
-                firma_vicerrector=firma_vicerrector,
-                nombre_vicerrector=nombre_vicerrector,
+                curso=curso_nombre,
+                horas=fila["horas"],
+                fecha=fila["fecha"],
+                facultad=fila["facultad"],
+                firma_decano=fila["firma_decano"],
+                nombre_decano=fila["nombre_decano"],
+                firma_vicerrector=fila["firma_vicerrector"],
+                nombre_vicerrector=fila["nombre_vicerrector"],
                 output_path=output_file
             )
 
-            st.write(f"**Certificado:** {curso_nombre}")
+            # Botón para descargar
             with open(output_file, "rb") as f:
-                st.download_button(
+                btn = st.download_button(
                     label=f"📄 Descargar {curso_nombre}",
-                    data=f.read(),
+                    data=f,
                     file_name=os.path.basename(output_file),
                     mime="application/pdf"
                 )
