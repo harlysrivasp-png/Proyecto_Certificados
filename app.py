@@ -35,7 +35,7 @@ if documento_input:
             output_file = f"certificados_generados/{fila['documento']}_{curso_nombre.replace(' ','_')}.pdf"
 
             # Validar rutas de imágenes existentes
-            logo = "assets/logo_uceva.png" if os.path.exists("assets/logo_uceva.png") else None
+            logo = "assets/logo.png" if os.path.exists("assets/logo.png") else None
             plantilla_fondo = "assets/plantilla_fondo.png" if os.path.exists("assets/plantilla_fondo.png") else None
             firma_decano = fila["firma_decano"] if os.path.exists(fila["firma_decano"]) else None
             firma_vicerrector = fila["firma_vicerrector"] if os.path.exists(fila["firma_vicerrector"]) else None
