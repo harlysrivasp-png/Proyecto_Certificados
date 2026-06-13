@@ -2,6 +2,7 @@ nombre;documento;programa;horas;fecha;facultad;firma_decano;firma_vicerrector
 Juan Pérez;12345;Educación Inicial;40;2026-05-10;Educación;assets/decano_educacion.png;assets/vicerrector.png
 Juan Pérez;12345;Matemáticas Básicas;50;2026-05-12;Salud;assets/decano_salud.png;assets/vicerrector.png
 Juan Pérez;12345;Matemáticas Básicas II;50;2026-05-12;Salud;assets/decano_economicas.png;assets/vicerrector.png
+Juan Pérez;12345;Matemáticas Básicas III;50;2026-05-12;Salud;assets/decano_economicas.png;assets/vicerrector.png
 Ana Gómez;67890;Economía Aplicada;60;2026-05-15;Ciencias Económicas;assets/decano_economicas.png;assets/vicerrector.png
 Luis Martínez;54321;Psicología General;45;2026-05-18;Ciencias Humanísticas;assets/decano_humanisticas.png;assets/vicerrector.png
 
