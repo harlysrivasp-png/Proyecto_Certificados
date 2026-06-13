@@ -1,0 +1,5 @@
+﻿nombre;documento;curso_o_diplomado;horas;fecha;facultad;firma_decano;nombre_decano;firma_vicerrector;nombre_vicerrector
+Juan Pérez;12345;Educación Inicial;40;10/05/2026 0:00;Educación;assets/decano_educacion.png;Gustavo Cárdenas;assets/vicerrector.png;Gustavo Rojas
+Juan Pérez;12345;Matemáticas Básicas;50;12/05/2026 0:00;Salud;assets/decano_salud.png;Javier Pérez;assets/vicerrector.png;Gustavo Rojas
+Ana Gómez;67890;Economía Aplicada;60;15/05/2026 0:00;Ciencias Económicas;assets/decano_economicas.png;Francisco Ríos;assets/vicerrector.png;Gustavo Rojas
+Luis Martínez;54321;Psicología General;45;18/05/2026 0:00;Ciencias Humanísticas;assets/decano_humanisticas.png;Martha Sánchez;assets/vicerrector.png;Gustavo Rojas
