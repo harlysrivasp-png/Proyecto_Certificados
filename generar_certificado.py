@@ -26,7 +26,7 @@ def generar_certificado(
     c.drawImage(ImageReader(plantilla_fondo), 0, 0, width=width, height=height)
 
     # Logo UCEVA
-    c.drawImage(ImageReader(logo), 3*cm, height - 18.5*cm, width=4*cm, preserveAspectRatio=True, mask='auto')
+    c.drawImage(ImageReader(logo), 3*cm, height - 18.5*cm, width=14*cm, preserveAspectRatio=True, mask='auto')
 
     # Título principal
     c.setFont("Helvetica-Bold", 24)
