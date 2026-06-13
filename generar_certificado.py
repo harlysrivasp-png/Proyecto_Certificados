@@ -26,11 +26,11 @@ def generar_certificado(
     c.drawImage(ImageReader(plantilla_fondo), 0, 0, width=width, height=height)
 
     # Logo UCEVA
-    c.drawImage(ImageReader(logo), 3*cm, height - 18.5*cm, width=5*cm, preserveAspectRatio=True, mask='auto')
+    c.drawImage(ImageReader(logo), 3*cm, height - 18.5*cm, width=6*cm, preserveAspectRatio=True, mask='auto')
 
     # Título principal
     c.setFont("Helvetica-Bold", 24)
-    c.drawCentredString(width/2, height - 4*cm, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
+    c.drawCentredString(width/2, height - 4.5*cm, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
 
     # Subtítulo: Facultad
     c.setFont("Helvetica", 16)
