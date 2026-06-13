@@ -1,53 +1,73 @@
-from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch
+from reportlab.lib.units import cm
+from reportlab.lib.utils import ImageReader
 import io
+import os
 
-def generar_certificado(nombre, documento, programa, horas, fecha, facultad,
-                        firma_decano, cargo_decano, firma_vicerrector, cargo_vicerrector,
-                        logo=None):
+def generar_certificado(nombre, documento, curso, horas, fecha, facultad,
+                        firma_decano_path, nombre_decano,
+                        firma_vicerrector_path, nombre_vicerrector,
+                        logo_path="assets/logo_uceva.png",
+                        output_path=None):
+    """
+    Genera un certificado PDF en memoria y lo guarda en output_path si se proporciona.
+    Devuelve un BytesIO listo para usar en Streamlit.
+    """
     buffer = io.BytesIO()
-    c = canvas.Canvas(buffer, pagesize=landscape(letter))
-    width, height = landscape(letter)
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
 
     # Logo
-    if logo:
-        try:
-            c.drawImage(logo, 50, height - 100, width=100, preserveAspectRatio=True, mask='auto')
-        except:
-            pass
+    try:
+        if logo_path and os.path.exists(logo_path):
+            logo = ImageReader(logo_path)
+            c.drawImage(logo, 2*cm, height - 4*cm, width=4*cm, preserveAspectRatio=True)
+    except:
+        pass
 
-    # Título
-    c.setFont("Helvetica-Bold", 24)
-    c.drawCentredString(width / 2, height - 50, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
+    # Encabezado
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width/2, height - 2*cm, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(width/2, height - 3*cm, f"Facultad de {facultad}")
 
-    # Subtítulo dinámico: facultad
-    c.setFont("Helvetica", 18)
-    c.drawCentredString(width / 2, height - 100, f"Facultad de {facultad}")
-
-    # Certifica que
-    c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(width / 2, height - 160, "CERTIFICA QUE")
-
-    # Nombre
-    c.setFont("Helvetica-Bold", 22)
-    c.drawCentredString(width / 2, height - 200, nombre)
-
-    # Documento y curso
-    c.setFont("Helvetica", 16)
-    c.drawCentredString(width / 2, height - 240, f"Documento: {documento}")
-    c.drawCentredString(width / 2, height - 270, f"Curso: {programa} ({horas} horas)")
-    c.drawCentredString(width / 2, height - 300, f"Fecha: {fecha}")
+    # Título y datos
+    c.setFont("Helvetica-Bold", 14)
+    c.drawCentredString(width/2, height - 5*cm, "CERTIFICA QUE")
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width/2, height - 6*cm, nombre.upper())
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(width/2, height - 7*cm, f"Documento: {documento}")
+    c.drawCentredString(width/2, height - 8*cm, f"Curso/Diplomado: {curso} ({horas} horas)")
+    c.drawCentredString(width/2, height - 9*cm, f"Fecha: {fecha}")
 
     # Firmas
-    firma_y = 100
-    c.drawImage(firma_decano, width / 4 - 50, firma_y, width=150, preserveAspectRatio=True, mask='auto')
-    c.drawString(width / 4 - 30, firma_y - 20, cargo_decano)
+    y_firma = 4*cm
+    if firma_decano_path and os.path.exists(firma_decano_path):
+        c.drawImage(firma_decano_path, width/4 - 2*cm, y_firma, width=4*cm, preserveAspectRatio=True)
+    if firma_vicerrector_path and os.path.exists(firma_vicerrector_path):
+        c.drawImage(firma_vicerrector_path, 3*width/4 - 2*cm, y_firma, width=4*cm, preserveAspectRatio=True)
 
-    c.drawImage(firma_vicerrector, 3 * width / 4 - 50, firma_y, width=150, preserveAspectRatio=True, mask='auto')
-    c.drawString(3 * width / 4 - 30, firma_y - 20, cargo_vicerrector)
+    # Nombres
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(width/4, y_firma - 1*cm, nombre_decano)
+    c.setFont("Helvetica", 9)
+    c.drawCentredString(width/4, y_firma - 1.5*cm, "Decano/a")
+
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(3*width/4, y_firma - 1*cm, nombre_vicerrector)
+    c.setFont("Helvetica", 9)
+    c.drawCentredString(3*width/4, y_firma - 1.5*cm, "Vicerrector/a")
 
     c.showPage()
     c.save()
     buffer.seek(0)
-    return buffer
+
+    # Guardar archivo si se proporcionó ruta
+    if output_path:
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(output_path, "wb") as f:
+            f.write(buffer.getbuffer())
+
+    return buffer  # Devuelve BytesIO para Streamlit
