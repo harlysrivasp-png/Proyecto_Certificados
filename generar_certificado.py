@@ -38,7 +38,7 @@ def generar_certificado(
 
     # Texto central
     c.setFont("Helvetica-Bold", 18)
-    c.drawCentredString(width/2, height - 6*cm, "CERTIFICA QUE")
+    c.drawCentredString(width/2, height - 7*cm, "CERTIFICA QUE")
 
     c.setFont("Helvetica-Bold", 22)
     c.drawCentredString(width/2, height - 8*cm, nombre)
