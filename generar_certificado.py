@@ -44,13 +44,13 @@ def generar_certificado(
     c.drawCentredString(width/2, height - 8*cm, nombre)
 
     c.setFont("Helvetica", 14)
-    c.drawCentredString(width/2, height - 9*cm, f"Identificado(a) con documento No. {documento}")
-    c.drawCentredString(width/2, height - 10*cm, "Participó y aprobó satisfactoriamente el curso:")
+    c.drawCentredString(width/2, height - 10*cm, f"Identificado(a) con documento No. {documento}")
+    c.drawCentredString(width/2, height - 11*cm, "Participó y aprobó satisfactoriamente el curso:")
     c.setFont("Helvetica-Bold", 18)
-    c.drawCentredString(width/2, height - 11*cm, f"{curso_o_diplomado}")
+    c.drawCentredString(width/2, height - 12*cm, f"{curso_o_diplomado}")
     c.setFont("Helvetica", 14)
-    c.drawCentredString(width/2, height - 12*cm, f"Con una intensidad de {horas} horas")
-    c.drawCentredString(width/2, height - 13*cm, f"Fecha de finalización: {fecha}")
+    c.drawCentredString(width/2, height - 13*cm, f"Con una intensidad de {horas} horas")
+    c.drawCentredString(width/2, height - 14*cm, f"Fecha de finalización: {fecha}")
 
     # Posición de las firmas
     y_firma = 3*cm
