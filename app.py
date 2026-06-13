@@ -1,4 +1,4 @@
-# app.py final
+# app.py actualizado
 import streamlit as st
 import pandas as pd
 from generar_certificado import generar_certificado
@@ -6,8 +6,9 @@ import os
 
 st.set_page_config(page_title="Portal de Certificados", layout="wide")
 st.title("Portal de Certificados - UCEVA")
+st.write("Ingrese su número de documento para consultar y descargar sus certificados")
 
-# Crear carpeta para certificados generados si no existe
+# Crear carpeta para certificados generados
 os.makedirs("certificados_generados", exist_ok=True)
 
 # Leer CSV
@@ -18,25 +19,25 @@ except Exception as e:
     st.error(f"Error al leer el CSV: {e}")
     st.stop()
 
-# Limpiar nombres de columnas (eliminar espacios invisibles)
+# Limpiar nombres de columna
 df.columns = df.columns.str.strip()
 df["documento"] = df["documento"].astype(str)
 
 # Input del documento
-documento_input = st.text_input("Ingrese su número de documento:")
+documento_input = st.text_input("Número de documento:")
 
 if documento_input:
     df_user = df[df["documento"] == documento_input.strip()]
-
+    
     if df_user.empty:
         st.warning("No se encontraron certificados para este documento.")
     else:
         st.success(f"Se encontraron {len(df_user)} certificado(s).")
 
-        # Botones horizontales
+        # Botones horizontales para cada certificado
         cols = st.columns(len(df_user))
         for i, fila in enumerate(df_user.itertuples()):
-            curso_nombre = getattr(fila, "curso_o_diplomado")
+            curso_nombre = getattr(fila, "curso_o_diplomado")  # usar _ en lugar de espacios
             output_file = f"certificados_generados/{fila.documento}_{curso_nombre.replace(' ','_')}.pdf"
 
             # Generar certificado
