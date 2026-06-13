@@ -1,12 +1,13 @@
+# app.py
 import streamlit as st
 import pandas as pd
 import os
 from generar_certificado import generar_certificado
 
-# Título de la app
-st.title("Portal de Certificados")
+st.set_page_config(page_title="Portal de Certificados", layout="wide")
+st.title("Portal de Certificados UCEVA")
 
-# Crear carpeta para guardar certificados generados
+# Crear carpeta de certificados generados
 os.makedirs("certificados_generados", exist_ok=True)
 
 # Cargar CSV
@@ -17,46 +18,54 @@ except Exception as e:
     st.error(f"No se pudo leer el CSV: {e}")
     st.stop()
 
-# Input de documento
-documento_buscar = st.text_input("Ingrese el documento del estudiante")
+# Convertir documento a string
+if "documento" not in df.columns:
+    st.error("El CSV debe tener la columna 'documento'")
+    st.stop()
+df["documento"] = df["documento"].astype(str)
 
-if documento_buscar:
-    # Filtrar por documento
-    df["documento"] = df["documento"].astype(str)
-    df_user = df[df["documento"] == documento_buscar]
+# Input del usuario
+documento_input = st.text_input("Ingrese el número de documento del estudiante:")
 
+if documento_input:
+    df_user = df[df["documento"] == documento_input.strip()]
     if df_user.empty:
-        st.warning("No se encontraron certificados para ese documento.")
+        st.warning("No se encontraron certificados para este documento.")
     else:
-        st.write(f"Se encontraron {len(df_user)} certificados para el documento {documento_buscar}.")
+        st.success(f"Se encontraron {len(df_user)} certificados para este estudiante.")
 
         for idx, fila in df_user.iterrows():
             curso_nombre = fila["curso_o_diplomado"]
-            output_file = f"certificados_generados/{fila.documento}_{curso_nombre.replace(' ','_')}.pdf"
+            output_file = f"certificados_generados/{fila['documento']}_{curso_nombre.replace(' ','_')}.pdf"
+
+            # Validar rutas de imágenes
+            logo_path = "assets/logo_uceva.png"
+            fondo_path = "assets/plantilla_fondo.png"
+            firma_decano = fila["firma_decano"] if os.path.exists(fila["firma_decano"]) else None
+            firma_vicerrector = fila["firma_vicerrector"] if os.path.exists(fila["firma_vicerrector"]) else None
 
             # Generar certificado
             generar_certificado(
                 nombre=fila["nombre"],
                 documento=fila["documento"],
-                curso=fila["curso_o_diplomado"],
+                curso_o_diplomado=curso_nombre,
                 horas=fila["horas"],
                 fecha=fila["fecha"],
                 facultad=fila["facultad"],
-                firma_decano=fila["firma_decano"],
+                logo=logo_path,
+                plantilla_fondo=fondo_path,
+                firma_decano=firma_decano,
                 nombre_decano=fila["nombre_decano"],
-                firma_vicerrector=fila["firma_vicerrector"],
+                firma_vicerrector=firma_vicerrector,
                 nombre_vicerrector=fila["nombre_vicerrector"],
                 output_path=output_file
             )
 
-            st.success(f"Certificado generado para {curso_nombre}")
-
-            # Botón de descarga
-            with open(output_file, "rb") as pdf_file:
-                pdf_bytes = pdf_file.read()
+            st.write(f"**Certificado:** {curso_nombre}")
+            with open(output_file, "rb") as f:
                 st.download_button(
                     label=f"📄 Descargar {curso_nombre}",
-                    data=pdf_bytes,
+                    data=f.read(),
                     file_name=os.path.basename(output_file),
                     mime="application/pdf"
                 )
