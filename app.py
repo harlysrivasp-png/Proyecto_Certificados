@@ -37,7 +37,7 @@ if documento_input:
         # Botones horizontales
         cols = st.columns(len(df_user))
         for i, (index, fila) in enumerate(df_user.iterrows()):
-            curso_nombre = fila["curso o diplomado"]
+            curso_nombre = fila["curso_o_diplomado"]
             output_file = f"certificados_generados/{fila.documento}_{curso_nombre.replace(' ','_')}.pdf"
 
             # Generar certificado
