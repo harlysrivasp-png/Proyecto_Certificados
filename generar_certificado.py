@@ -12,89 +12,61 @@ def generar_certificado(
     facultad,
     firma_decano,
     nombre_decano,
+    cargo_decano,
     firma_vicerrector,
     nombre_vicerrector,
+    cargo_vicerrector,
     output_path
 ):
-    """
-    Genera un certificado en PDF para un estudiante con las firmas y cargos correspondientes.
-    """
-
-    width, height = letter
     c = canvas.Canvas(output_path, pagesize=letter)
-
-    # Margen superior
-    y = height - 4*cm
+    width, height = letter
 
     # Encabezado
     c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width/2, y, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
-    y -= 0.8*cm
+    c.drawCentredString(width/2, height - 3*cm, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
     c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, y, f"Facultad de {facultad}")
-    y -= 2*cm
+    c.drawCentredString(width/2, height - 4*cm, f"Facultad de {facultad}")
 
-    # Certifica que
+    # Cuerpo
     c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width/2, y, "CERTIFICA QUE")
-    y -= 1*cm
+    c.drawCentredString(width/2, height - 6*cm, "CERTIFICA QUE")
 
-    # Nombre estudiante
-    c.setFont("Helvetica-Bold", 18)
-    c.drawCentredString(width/2, y, nombre)
-    y -= 1*cm
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width/2, height - 7*cm, nombre)
 
-    # Documento
     c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, y, f"Identificado(a) con documento No. {documento}")
-    y -= 0.7*cm
-
-    # Texto del curso
-    c.drawCentredString(width/2, y, "Participó y aprobó satisfactoriamente el curso:")
-    y -= 0.7*cm
-
+    c.drawCentredString(width/2, height - 8*cm, f"Identificado(a) con documento No. {documento}")
+    c.drawCentredString(width/2, height - 9*cm, f"Participó y aprobó satisfactoriamente el curso:")
     c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width/2, y, curso)
-    y -= 1*cm
-
-    # Horas y fecha
+    c.drawCentredString(width/2, height - 10*cm, f"{curso}")
     c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, y, f"Con una intensidad de {horas} horas")
-    y -= 0.7*cm
-    c.drawCentredString(width/2, y, f"Fecha de finalización: {fecha}")
-    y -= 3*cm
+    c.drawCentredString(width/2, height - 11*cm, f"Con una intensidad de {horas} horas")
+    c.drawCentredString(width/2, height - 12*cm, f"Fecha de finalización: {fecha}")
 
     # Firmas
     firma_ancho = 5*cm
     firma_alto = 2*cm
-    y_firma = y
+    y_firma = 3*cm
 
+    # Línea debajo de la firma
+    c.line(width/4 - firma_ancho/2, y_firma, width/4 + firma_ancho/2, y_firma)
+    c.line(3*width/4 - firma_ancho/2, y_firma, 3*width/4 + firma_ancho/2, y_firma)
+
+    # Dibujar imágenes de firma
     try:
-        # Firma decano
-        if firma_decano and nombre_decano:
-            c.drawImage(
-                ImageReader(firma_decano),
-                width/4 - firma_ancho/2,
-                y_firma,
-                width=firma_ancho,
-                height=firma_alto
-            )
-            c.drawCentredString(width/4, y_firma - 0.5*cm, f"{nombre_decano}")
-            c.drawCentredString(width/4, y_firma - 1*cm, f"Decano(a) Facultad de {facultad}")
-
-        # Firma vicerrector
-        if firma_vicerrector and nombre_vicerrector:
-            c.drawImage(
-                ImageReader(firma_vicerrector),
-                3*width/4 - firma_ancho/2,
-                y_firma,
-                width=firma_ancho,
-                height=firma_alto
-            )
-            c.drawCentredString(3*width/4, y_firma - 0.5*cm, f"{nombre_vicerrector}")
-            c.drawCentredString(3*width/4, y_firma - 1*cm, "Vicerrector Académico")
+        if firma_decano:
+            c.drawImage(ImageReader(firma_decano), width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto)
+        if firma_vicerrector:
+            c.drawImage(ImageReader(firma_vicerrector), 3*width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto)
     except Exception as e:
-        print(f"No se pudieron cargar las firmas: {e}")
+        print(f"No se pudo cargar la firma: {e}")
 
-    c.showPage()
+    # Nombres y cargos
+    c.setFont("Helvetica", 10)
+    c.drawCentredString(width/4, y_firma - 0.7*cm, str(nombre_decano))
+    c.drawCentredString(width/4, y_firma - 1.2*cm, str(cargo_decano))
+
+    c.drawCentredString(3*width/4, y_firma - 0.7*cm, str(nombre_vicerrector))
+    c.drawCentredString(3*width/4, y_firma - 1.2*cm, str(cargo_vicerrector))
+
     c.save()
