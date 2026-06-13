@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import pandas as pd
 import os
@@ -7,10 +6,10 @@ from generar_certificado import generar_certificado
 st.set_page_config(page_title="Portal de Certificados", layout="wide")
 st.title("Portal de Certificados UCEVA")
 
-# Crear carpeta de certificados generados
+# Carpeta de salida
 os.makedirs("certificados_generados", exist_ok=True)
 
-# Cargar CSV
+# Leer CSV
 csv_path = "data/certificados_streamlit_ready.csv"
 try:
     df = pd.read_csv(csv_path, sep=';', encoding="utf-8-sig").fillna("")
@@ -24,7 +23,7 @@ if "documento" not in df.columns:
     st.stop()
 df["documento"] = df["documento"].astype(str)
 
-# Input del usuario
+# Input de documento
 documento_input = st.text_input("Ingrese el número de documento del estudiante:")
 
 if documento_input:
@@ -35,29 +34,46 @@ if documento_input:
         st.success(f"Se encontraron {len(df_user)} certificados para este estudiante.")
 
         for idx, fila in df_user.iterrows():
-            curso_nombre = fila["curso_o_diplomado"]
-            output_file = f"certificados_generados/{fila['documento']}_{curso_nombre.replace(' ','_')}.pdf"
+            # Valores por defecto
+            curso_nombre = fila.get("curso_o_diplomado", "Curso Desconocido")
+            horas = fila.get("horas", "0")
+            fecha = fila.get("fecha", "")
+            facultad = fila.get("facultad", "")
+            nombre = fila.get("nombre", "")
+            nombre_decano = fila.get("nombre_decano", "")
+            nombre_vicerrector = fila.get("nombre_vicerrector", "")
 
             # Validar rutas de imágenes
-            logo_path = "assets/logo_uceva.png"
-            fondo_path = "assets/plantilla_fondo.png"
-            firma_decano = fila["firma_decano"] if os.path.exists(fila["firma_decano"]) else None
-            firma_vicerrector = fila["firma_vicerrector"] if os.path.exists(fila["firma_vicerrector"]) else None
+            logo = "assets/logo_uceva.png"
+            plantilla_fondo = "assets/plantilla_fondo.png"
+            firma_decano = fila.get("firma_decano", "")
+            firma_vicerrector = fila.get("firma_vicerrector", "")
+
+            if not os.path.exists(logo):
+                logo = None
+            if not os.path.exists(plantilla_fondo):
+                plantilla_fondo = None
+            if not os.path.exists(firma_decano):
+                firma_decano = None
+            if not os.path.exists(firma_vicerrector):
+                firma_vicerrector = None
+
+            output_file = f"certificados_generados/{fila['documento']}_{curso_nombre.replace(' ','_')}.pdf"
 
             # Generar certificado
             generar_certificado(
-                nombre=fila["nombre"],
+                nombre=nombre,
                 documento=fila["documento"],
                 curso_o_diplomado=curso_nombre,
-                horas=fila["horas"],
-                fecha=fila["fecha"],
-                facultad=fila["facultad"],
-                logo=logo_path,
-                plantilla_fondo=fondo_path,
+                horas=horas,
+                fecha=fecha,
+                facultad=facultad,
+                logo=logo,
+                plantilla_fondo=plantilla_fondo,
                 firma_decano=firma_decano,
-                nombre_decano=fila["nombre_decano"],
+                nombre_decano=nombre_decano,
                 firma_vicerrector=firma_vicerrector,
-                nombre_vicerrector=fila["nombre_vicerrector"],
+                nombre_vicerrector=nombre_vicerrector,
                 output_path=output_file
             )
 
