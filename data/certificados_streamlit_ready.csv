@@ -1,5 +1,5 @@
 ﻿nombre;documento;curso_o_diplomado;horas;fecha;facultad;firma_decano;nombre_decano;firma_vicerrector;nombre_vicerrector
-Juan Pérez;12345;Educación Inicial;40;2026-05-10;Educación;assets/firma_decano_educacion.png;Gustavo Rojas;assets/firma_vicerrector.png;Gustavo Rojas
-Juan Pérez;12345;Matemáticas Básicas;50;2026-05-12;Salud;assets/firma_decano_salud.png;Marcos Ríos;assets/firma_vicerrector.png;Gustavo Rojas
-Ana Gómez;67890;Economía Aplicada;60;2026-05-15;Ciencias Económicas;assets/firma_decano_economicas.png;Juan Lores;assets/firma_vicerrector.png;Gustavo Rojas
-Luis Martínez;54321;Psicología General;45;2026-05-18;Ciencias Humanísticas;assets/firma_decano_humanisticas.png;Martha Sánchez;assets/firma_vicerrector.png;Gustavo Rojas
+Juan Pérez;12345;Educación Inicial;40;2026-05-10;Ciencias de la Educación;assets/firma_decano_educacion.png;Gustavo Rojas;assets/firma_vicerrector.png;Gustavo Rojas
+Juan Pérez;12345;Matemáticas Básicas;50;2026-05-12;Ciencias de la Salud;assets/firma_decano_salud.png;Marcos Ríos;assets/firma_vicerrector.png;Gustavo Rojas
+Ana Gómez;67890;Economía Aplicada;60;2026-05-15;Ciencias Administrativa, Económicas y Contables;assets/firma_decano_economicas.png;Juan Lores;assets/firma_vicerrector.png;Gustavo Rojas
+Luis Martínez;54321;Psicología General;45;2026-05-18;Ciencias Jurídicas y Humanísticas;assets/firma_decano_humanisticas.png;Martha Sánchez;assets/firma_vicerrector.png;Gustavo Rojas
