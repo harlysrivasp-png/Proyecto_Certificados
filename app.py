@@ -1,46 +1,44 @@
+# app.py final
 import streamlit as st
 import pandas as pd
 from generar_certificado import generar_certificado
 import os
 
-# --- Configuración de la página ---
 st.set_page_config(page_title="Portal de Certificados", layout="wide")
-
-# --- Título ---
 st.title("Portal de Certificados")
-st.write("Ingrese su documento para consultar y descargar sus certificados")
 
-# --- Leer CSV ---
-csv_path = "data/certificados_streamlit_ready.csv"
+# Ruta del CSV
+CSV_PATH = "data/certificados_streamlit_ready.csv"
+
+# Leer CSV
 try:
-    df = pd.read_csv(csv_path, encoding="utf-8")
+    df = pd.read_csv(CSV_PATH, encoding="utf-8", sep=';')
 except Exception as e:
     st.error(f"Error al leer el CSV: {e}")
     st.stop()
 
-# Limpiar nombres de columnas (eliminar espacios)
+# Limpiar nombres de columnas
 df.columns = df.columns.str.strip()
 
 # Convertir documento a string
 df["documento"] = df["documento"].astype(str)
 
-# --- Entrada del usuario ---
-documento_buscar = st.text_input("Documento:")
+# Input de documento
+documento_input = st.text_input("Ingrese su número de documento:")
 
-if documento_buscar:
-    df_user = df[df["documento"] == documento_buscar]
+if documento_input:
+    df_user = df[df["documento"] == documento_input.strip()]
     
     if df_user.empty:
         st.warning("No se encontraron certificados para este documento.")
     else:
         st.success(f"Se encontraron {len(df_user)} certificado(s).")
-
-        # Contenedor horizontal para botones
+        
+        # Botones horizontales
         cols = st.columns(len(df_user))
-
         for i, (index, fila) in enumerate(df_user.iterrows()):
             curso_nombre = fila["curso o diplomado"]
-            output_file = f"certificados_generados/{fila.documento}_{curso_nombre.replace(' ', '_')}.pdf"
+            output_file = f"certificados_generados/{fila.documento}_{curso_nombre.replace(' ','_')}.pdf"
 
             # Generar certificado
             generar_certificado(
@@ -57,7 +55,7 @@ if documento_buscar:
                 output_path=output_file
             )
 
-            # Botón de descarga
+            # Mostrar botón de descarga
             with cols[i]:
                 with open(output_file, "rb") as pdf_file:
                     pdf_bytes = pdf_file.read()
