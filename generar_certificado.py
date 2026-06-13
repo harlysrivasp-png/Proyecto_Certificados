@@ -1,72 +1,94 @@
+# generar_certificado.py
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
+import os
 
 def generar_certificado(
     nombre,
     documento,
-    curso,
+    curso_o_diplomado,
     horas,
     fecha,
     facultad,
     firma_decano,
     nombre_decano,
-    cargo_decano,
     firma_vicerrector,
     nombre_vicerrector,
-    cargo_vicerrector,
-    output_path
+    logo_path="assets/logo_uceva.png",
+    plantilla_fondo="assets/fondo_certificado.png",
+    output_path="certificados_generados/certificado.pdf"
 ):
-    c = canvas.Canvas(output_path, pagesize=letter)
+    """
+    Genera un certificado en PDF con logo, fondo, firmas, líneas y nombres.
+    """
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     width, height = letter
+    c = canvas.Canvas(output_path, pagesize=letter)
+
+    # Fondo
+    if os.path.exists(plantilla_fondo):
+        c.drawImage(ImageReader(plantilla_fondo), 0, 0, width=width, height=height, mask='auto')
+
+    # Logo superior izquierdo
+    if os.path.exists(logo_path):
+        c.drawImage(ImageReader(logo_path), 2*cm, height - 4*cm, width=4*cm, height=3*cm, mask='auto')
 
     # Encabezado
+    c.setFont("Helvetica-Bold", 18)
+    c.drawCentredString(width/2, height - 4*cm, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
+    c.setFont("Helvetica", 14)
+    c.drawCentredString(width/2, height - 5*cm, f"Facultad de {facultad}")
+
+    # Cuerpo del certificado
+    y_text = height - 7*cm
     c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width/2, height - 3*cm, "UNIDAD CENTRAL DEL VALLE DEL CAUCA")
-    c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, height - 4*cm, f"Facultad de {facultad}")
+    c.drawCentredString(width/2, y_text, "CERTIFICA QUE")
+    y_text -= 1.5*cm
 
-    # Cuerpo
+    c.setFont("Helvetica-Bold", 20)
+    c.drawCentredString(width/2, y_text, nombre.upper())
+    y_text -= 1*cm
+
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(width/2, y_text, f"Identificado(a) con documento No. {documento}")
+    y_text -= 1*cm
+    c.drawCentredString(width/2, y_text, "Participó y aprobó satisfactoriamente el curso:")
+    y_text -= 1*cm
+
     c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width/2, height - 6*cm, "CERTIFICA QUE")
-
-    c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width/2, height - 7*cm, nombre)
+    c.drawCentredString(width/2, y_text, curso_o_diplomado)
+    y_text -= 1*cm
 
     c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, height - 8*cm, f"Identificado(a) con documento No. {documento}")
-    c.drawCentredString(width/2, height - 9*cm, f"Participó y aprobó satisfactoriamente el curso:")
-    c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width/2, height - 10*cm, f"{curso}")
-    c.setFont("Helvetica", 12)
-    c.drawCentredString(width/2, height - 11*cm, f"Con una intensidad de {horas} horas")
-    c.drawCentredString(width/2, height - 12*cm, f"Fecha de finalización: {fecha}")
+    c.drawCentredString(width/2, y_text, f"Con una intensidad de {horas} horas")
+    y_text -= 1*cm
+    c.drawCentredString(width/2, y_text, f"Fecha de finalización: {fecha}")
 
     # Firmas
-    firma_ancho = 5*cm
+    y_firma = 4*cm
+    firma_ancho = 6*cm
     firma_alto = 2*cm
-    y_firma = 3*cm
 
-    # Línea debajo de la firma
-    c.line(width/4 - firma_ancho/2, y_firma, width/4 + firma_ancho/2, y_firma)
-    c.line(3*width/4 - firma_ancho/2, y_firma, 3*width/4 + firma_ancho/2, y_firma)
+    # Decano
+    if os.path.exists(firma_decano):
+        c.drawImage(ImageReader(firma_decano), width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto, mask='auto')
+    c.line(width/4 - firma_ancho/2, y_firma - 0.1*cm, width/4 + firma_ancho/2, y_firma - 0.1*cm)
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(width/4, y_firma - 0.8*cm, nombre_decano)
+    c.setFont("Helvetica", 9)
+    c.drawCentredString(width/4, y_firma - 1.3*cm, f"Decano(a) Facultad de {facultad}")
 
-    # Dibujar imágenes de firma
-    try:
-        if firma_decano:
-            c.drawImage(ImageReader(firma_decano), width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto)
-        if firma_vicerrector:
-            c.drawImage(ImageReader(firma_vicerrector), 3*width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto)
-    except Exception as e:
-        print(f"No se pudo cargar la firma: {e}")
+    # Vicerrector
+    if os.path.exists(firma_vicerrector):
+        c.drawImage(ImageReader(firma_vicerrector), 3*width/4 - firma_ancho/2, y_firma, width=firma_ancho, height=firma_alto, mask='auto')
+    c.line(3*width/4 - firma_ancho/2, y_firma - 0.1*cm, 3*width/4 + firma_ancho/2, y_firma - 0.1*cm)
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(3*width/4, y_firma - 0.8*cm, nombre_vicerrector)
+    c.setFont("Helvetica", 9)
+    c.drawCentredString(3*width/4, y_firma - 1.3*cm, "Vicerrector Académico")
 
-    # Nombres y cargos
-    c.setFont("Helvetica", 10)
-    c.drawCentredString(width/4, y_firma - 0.7*cm, str(nombre_decano))
-    c.drawCentredString(width/4, y_firma - 1.2*cm, str(cargo_decano))
-
-    c.drawCentredString(3*width/4, y_firma - 0.7*cm, str(nombre_vicerrector))
-    c.drawCentredString(3*width/4, y_firma - 1.2*cm, str(cargo_vicerrector))
-
+    c.showPage()
     c.save()
+    return output_path
