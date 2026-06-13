@@ -48,7 +48,7 @@ if documento_input:
                 horas=fila.get("horas",""),
                 fecha=fila.get("fecha",""),
                 facultad=fila.get("facultad",""),
-                logo=logo_uceva,
+                logo=logo,
                 plantilla_fondo=plantilla_fondo,
                 firma_decano=firma_decano,
                 nombre_decano=fila.get("nombre_decano",""),
