@@ -47,7 +47,7 @@ def generar_certificado(
     c.drawCentredString(width/2, height - 10*cm, f"Identificado(a) con documento No. {documento}")
     c.drawCentredString(width/2, height - 11*cm, "Participó y aprobó satisfactoriamente el curso:")
     c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(width/2, height - 12.5*cm, f"{curso_o_diplomado}")
+    c.drawCentredString(width/2, height - 12.7*cm, f"{curso_o_diplomado}")
     c.setFont("Helvetica", 14)
     c.drawCentredString(width/2, height - 14*cm, f"Con una intensidad de {horas} horas")
     c.drawCentredString(width/2, height - 15*cm, f"Fecha de finalización: {fecha}")
