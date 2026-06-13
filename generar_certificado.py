@@ -69,7 +69,7 @@ def generar_certificado(
     # Firma del vicerrector
     c.drawImage(ImageReader(firma_vicerrector), 3*width/4 - firma_ancho/2, y_firma + 0.7*cm, width=firma_ancho, height=firma_alto, preserveAspectRatio=True, mask='auto')
     # Línea horizontal bajo la firma
-    c.line(3*width/6 - firma_ancho/2, y_firma + 0.5*cm, 3*width/4 + firma_ancho/2, y_firma + 0.5*cm)
+    c.line(3*width/4 - firma_ancho/2, y_firma + 0.5*cm, 3*width/6 + firma_ancho/2, y_firma + 0.5*cm)
     c.setFont("Helvetica-Bold", 12)
     c.drawCentredString(3*width/4, y_firma, nombre_vicerrector)
     c.setFont("Helvetica", 10)
