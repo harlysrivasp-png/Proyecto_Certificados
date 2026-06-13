@@ -59,7 +59,7 @@ if documento_input:
                 nombre_decano=fila["nombre_decano"],
                 firma_vicerrector=fila["firma_vicerrector"],
                 nombre_vicerrector=fila["nombre_vicerrector"],
-                logo_uceva=logo_uceva_path,
+                logo_uceva=logo_uceva,
                 plantilla_fondo=plantilla_fondo,
                 output_path=output_file
             )
