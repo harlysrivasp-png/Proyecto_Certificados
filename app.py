@@ -8,7 +8,7 @@ st.set_page_config(page_title="Portal de Certificados", layout="wide")
 st.title("📄 Portal de Certificados - UCEVA")
 
 # Leer CSV con ruta absoluta y codificación UTF-8
-csv_path = "/mnt/data/certificados_final_utf8.csv"
+csv_path = "/data/certificados_final_utf8.csv"
 try:
     df = pd.read_csv(csv_path, encoding="utf-8-sig", sep=";")
 except Exception as e:
